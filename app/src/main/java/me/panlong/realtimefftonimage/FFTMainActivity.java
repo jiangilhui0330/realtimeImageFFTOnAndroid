@@ -6,7 +6,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 
-public class FFTMainActivity extends Activity {
+public class FFTMainActivity extends Activity implements CameraFrameListener {
     private CameraPreview mCameraPreview;
 
     @Override
@@ -15,6 +15,7 @@ public class FFTMainActivity extends Activity {
         setContentView(R.layout.activity_fftmain);
 
         mCameraPreview = (CameraPreview) findViewById(R.id.surfaceView_cameraPreview);
+        mCameraPreview.setCameraFrameListener(this);
     }
 
     @Override
@@ -37,5 +38,10 @@ public class FFTMainActivity extends Activity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onCameraFrame(byte[] data) {
+
     }
 }
