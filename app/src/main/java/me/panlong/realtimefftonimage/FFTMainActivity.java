@@ -1,12 +1,12 @@
 package me.panlong.realtimefftonimage;
 
-import android.support.v7.app.ActionBarActivity;
+import android.app.Activity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 
 
-public class FFTMainActivity extends ActionBarActivity {
+public class FFTMainActivity extends Activity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

@@ -3,6 +3,74 @@
     android:layout_height="match_parent" android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    android:paddingBottom="@dimen/activity_vertical_margin" tools:context=".FFTMainActivity">
+    android:paddingBottom="@dimen/activity_vertical_margin" tools:context=".FFTMainActivity"
+    android:keepScreenOn="true"
+    android:background="@color/material_blue_grey_900" >
 
+    <SurfaceView
+        android:layout_width="320dp"
+        android:layout_height="240dp"
+        android:id="@+id/surfaceView_cameraPreview"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+
+    <SurfaceView
+        android:layout_width="160dp"
+        android:layout_height="120dp"
+        android:id="@+id/surfaceView_magnitude"
+        android:layout_marginTop="25dp"
+        android:layout_alignTop="@+id/surfaceView_cameraPreview"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true" />
+
+    <SurfaceView
+        android:layout_width="160dp"
+        android:layout_height="120dp"
+        android:id="@+id/surfaceView_phase"
+        android:layout_alignParentBottom="true"
+        android:layout_alignRight="@+id/surfaceView_magnitude"
+        android:layout_alignEnd="@+id/surfaceView_magnitude" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="Magnitude"
+        android:id="@+id/textView_magnitude"
+        android:layout_alignTop="@+id/surfaceView_cameraPreview"
+        android:layout_alignRight="@+id/surfaceView_magnitude"
+        android:layout_alignEnd="@+id/surfaceView_magnitude" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="Phase"
+        android:id="@+id/textView_phase"
+        android:layout_above="@+id/surfaceView_phase"
+        android:layout_alignRight="@+id/textView_magnitude"
+        android:layout_alignEnd="@+id/textView_magnitude" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Start/End"
+        android:id="@+id/button_startFFT"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginLeft="33dp"
+        android:layout_marginStart="33dp" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Choose Area"
+        android:id="@+id/button_chooseArea"
+        android:layout_alignParentBottom="true"
+        android:layout_alignRight="@+id/surfaceView_cameraPreview"
+        android:layout_alignEnd="@+id/surfaceView_cameraPreview"
+        android:layout_marginRight="34dp"
+        android:layout_marginEnd="34dp" />
 </RelativeLayout>
