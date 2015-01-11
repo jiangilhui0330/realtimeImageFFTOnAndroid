@@ -7,7 +7,7 @@
     android:keepScreenOn="true"
     android:background="@color/background_material_light" >
 
-    <SurfaceView
+    <me.panlong.realtimefftonimage.CameraPreview
         android:layout_width="320dp"
         android:layout_height="240dp"
         android:id="@+id/surfaceView_cameraPreview"

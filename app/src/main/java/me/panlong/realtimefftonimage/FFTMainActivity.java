@@ -7,13 +7,15 @@ import android.view.MenuItem;
 
 
 public class FFTMainActivity extends Activity {
+    private CameraPreview mCameraPreview;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_fftmain);
-    }
 
+        mCameraPreview = (CameraPreview) findViewById(R.id.surfaceView_cameraPreview);
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
