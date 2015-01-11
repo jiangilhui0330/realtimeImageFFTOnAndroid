@@ -1,7 +1,5 @@
 package me.panlong.realtimefftonimage;
 
-import android.util.Log;
-
 import edu.emory.mathcs.jtransforms.fft.DoubleFFT_2D;
 
 /**

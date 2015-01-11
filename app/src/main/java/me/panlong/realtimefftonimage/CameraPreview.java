@@ -92,4 +92,16 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
         if (mICameraFrameListener != null)
             mICameraFrameListener.onCameraFrame(data, actualPreviewWidth, actualPreviewHeight);
     }
+
+    public void freezeCameraPreview() {
+        if (mCamera != null) {
+            mCamera.stopPreview();
+        }
+    }
+
+    public void resumeCameraPreview() {
+        if (mCamera != null) {
+            mCamera.startPreview();
+        }
+    }
 }

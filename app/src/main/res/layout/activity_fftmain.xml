@@ -57,22 +57,22 @@
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Start/End"
+        android:text="Resume/Pause"
         android:id="@+id/button_startFFT"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_marginLeft="33dp"
-        android:layout_marginStart="33dp" />
+        android:layout_alignTop="@+id/button_chooseArea"
+        android:layout_toLeftOf="@+id/button_chooseArea"
+        android:layout_toStartOf="@+id/button_chooseArea"
+        android:layout_marginRight="19dp"
+        android:layout_marginEnd="19dp" />
 
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Choose Area"
         android:id="@+id/button_chooseArea"
-        android:layout_alignParentBottom="true"
+        android:layout_marginRight="19dp"
+        android:layout_marginEnd="19dp"
+        android:layout_alignBottom="@+id/surfaceView_phase"
         android:layout_alignRight="@+id/surfaceView_cameraPreview"
-        android:layout_alignEnd="@+id/surfaceView_cameraPreview"
-        android:layout_marginRight="34dp"
-        android:layout_marginEnd="34dp" />
+        android:layout_alignEnd="@+id/surfaceView_cameraPreview" />
 </RelativeLayout>

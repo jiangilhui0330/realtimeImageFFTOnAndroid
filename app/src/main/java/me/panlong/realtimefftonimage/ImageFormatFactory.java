@@ -1,7 +1,6 @@
 package me.panlong.realtimefftonimage;
 
 import android.graphics.Bitmap;
-import android.util.Log;
 
 /**
  * Created by panlong on 11/1/15.
