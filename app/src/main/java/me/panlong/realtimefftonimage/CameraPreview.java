@@ -7,13 +7,18 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
 import java.io.IOException;
+import java.util.List;
 
 /**
  * Created by panlong on 11/1/15.
  */
-public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback {
+public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback, Camera.PreviewCallback {
+    public static final int CAMERA_PREVIEW_WIDTH = 320;
+    public static final int CAMERA_PREVIEW_HEIGHT = 240;
+
     private Camera mCamera;
     private SurfaceHolder mHolder;
+    private CameraFrameListner mCameraFrameListner;
 
     public CameraPreview(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -24,9 +29,23 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
 
     public void setCamera(Camera camera) {
         mCamera = camera;
+        setPreferredCameraPreviewSize();
 
         mHolder = getHolder();
         mHolder.addCallback(this);
+    }
+
+    private void setPreferredCameraPreviewSize() {
+        Camera.Parameters cameraParams = mCamera.getParameters();
+        List<Camera.Size> supportedCameraPreviewSizes = cameraParams.getSupportedPreviewSizes();
+        int preferredCameraPreviewSizeId = CameraUtils.closest(supportedCameraPreviewSizes, CAMERA_PREVIEW_WIDTH, CAMERA_PREVIEW_HEIGHT);
+
+        cameraParams.setPreviewSize(supportedCameraPreviewSizes.get(preferredCameraPreviewSizeId).width, supportedCameraPreviewSizes.get(preferredCameraPreviewSizeId).height);
+        mCamera.setParameters(cameraParams);
+    }
+
+    public void setCameraFrameListner(CameraFrameListner listner) {
+        mCameraFrameListner = listner;
     }
 
     @Override
@@ -58,5 +77,11 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
             mCamera.release();
             mCamera = null;
         }
+    }
+
+    @Override
+    public void onPreviewFrame(byte[] data, Camera camera) {
+        if (mCameraFrameListner != null)
+            mCameraFrameListner.onCameraFrame(data);
     }
 }

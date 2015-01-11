@@ -55,8 +55,4 @@ public class CameraUtils {
 
         return best;
     }
-
-    public static Camera.Size closestS(List<Camera.Size> sizes, int width, int height) {
-        return sizes.get(closest(sizes,width,height));
-    }
 }
