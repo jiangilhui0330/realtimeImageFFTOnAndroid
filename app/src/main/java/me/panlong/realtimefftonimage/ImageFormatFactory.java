@@ -12,11 +12,9 @@ public class ImageFormatFactory {
         int p;
         for(int i = 0; i < height; i++) {
             for (int j = 0; j < width; j ++) {
-//                p = data[i * width + j] & 0xFF;
-//                pixels[i][j] = (double) (0xff000000 | p << 16 | p << 8 | p);
-                p = data[i * width + j];
+                p = data[i * width + j] & 0xFF;
                 p += 128;
-                pixels[i][j] = p;
+                pixels[i][j] = (double) (0xff000000 | p << 16 | p << 8 | p);
             }
         }
 
@@ -29,9 +27,7 @@ public class ImageFormatFactory {
 
         for (int i = 0; i < height; i ++) {
             for (int j = 0; j < width; j ++) {
-//                intData[i * width + j] = (int) data[i][j];
-                p = ((int) data[i][j]) & 0x000000FF;
-                intData[i * width + j] = 0xff000000 | p << 16 | p << 8 | p;
+                intData[i * width + j] = (int) data[i][j];
             }
         }
 

@@ -67,7 +67,8 @@ public class ImageFFTProcessor {
                 double im = mImageData[i][2 * j + 1];
 
                 mMagnitudeOfResult[i][j] = Math.sqrt(re * re + im * im);
-                mPhaseOfResult[i][j] = Math.atan2(im, re) / Math.PI * 255;
+                int pixel = (int) (Math.abs(Math.atan2(im, re)) / Math.PI * 255);
+                mPhaseOfResult[i][j] = (double) (0xff000000 | pixel << 16 | pixel << 8 | pixel);
             }
         }
     }
