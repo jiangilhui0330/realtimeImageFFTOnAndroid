@@ -13,7 +13,6 @@ public class ImageFormatFactory {
         for(int i = 0; i < height; i++) {
             for (int j = 0; j < width; j ++) {
                 p = data[i * width + j] & 0xFF;
-                p += 128;
                 pixels[i][j] = (double) (0xff000000 | p << 16 | p << 8 | p);
             }
         }
