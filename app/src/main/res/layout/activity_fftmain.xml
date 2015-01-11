@@ -40,7 +40,8 @@
         android:id="@+id/textView_magnitude"
         android:layout_alignTop="@+id/surfaceView_cameraPreview"
         android:layout_alignRight="@+id/surfaceView_magnitude"
-        android:layout_alignEnd="@+id/surfaceView_magnitude" />
+        android:layout_alignEnd="@+id/surfaceView_magnitude"
+        android:textColor="@color/primary_material_dark" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -50,7 +51,8 @@
         android:id="@+id/textView_phase"
         android:layout_above="@+id/surfaceView_phase"
         android:layout_alignRight="@+id/textView_magnitude"
-        android:layout_alignEnd="@+id/textView_magnitude" />
+        android:layout_alignEnd="@+id/textView_magnitude"
+        android:textColor="@color/primary_material_dark" />
 
     <Button
         android:layout_width="wrap_content"
