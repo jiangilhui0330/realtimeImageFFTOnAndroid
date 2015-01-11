@@ -89,6 +89,9 @@ public class FFTMainActivity extends Activity implements ICameraFrameListener {
 
             mMagnitudeSurfaceView.draw(mMagnitudeBitmap);
             mPhaseSurfaceView.draw(mPhaseBitmap);
+
+            mMagnitudeBitmap.recycle();
+            mPhaseBitmap.recycle();
         }
     }
 }
