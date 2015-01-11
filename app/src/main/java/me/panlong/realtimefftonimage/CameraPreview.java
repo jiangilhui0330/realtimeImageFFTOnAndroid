@@ -18,7 +18,7 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
 
     private Camera mCamera;
     private SurfaceHolder mHolder;
-    private CameraFrameListner mCameraFrameListner;
+    private CameraFrameListener mCameraFrameListener;
 
     public CameraPreview(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -44,8 +44,8 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
         mCamera.setParameters(cameraParams);
     }
 
-    public void setCameraFrameListner(CameraFrameListner listner) {
-        mCameraFrameListner = listner;
+    public void setCameraFrameListener(CameraFrameListener listener) {
+        mCameraFrameListener = listener;
     }
 
     @Override
@@ -81,7 +81,7 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
 
     @Override
     public void onPreviewFrame(byte[] data, Camera camera) {
-        if (mCameraFrameListner != null)
-            mCameraFrameListner.onCameraFrame(data);
+        if (mCameraFrameListener != null)
+            mCameraFrameListener.onCameraFrame(data);
     }
 }
