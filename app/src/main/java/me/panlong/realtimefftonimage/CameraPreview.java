@@ -18,7 +18,10 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
 
     private Camera mCamera;
     private SurfaceHolder mHolder;
-    private CameraFrameListener mCameraFrameListener;
+    private ICameraFrameListener mICameraFrameListener;
+
+    private int actualPreviewWidth;
+    private int actualPreviewHeight;
 
     public CameraPreview(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -40,18 +43,22 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
         List<Camera.Size> supportedCameraPreviewSizes = cameraParams.getSupportedPreviewSizes();
         int preferredCameraPreviewSizeId = CameraUtils.closest(supportedCameraPreviewSizes, CAMERA_PREVIEW_WIDTH, CAMERA_PREVIEW_HEIGHT);
 
-        cameraParams.setPreviewSize(supportedCameraPreviewSizes.get(preferredCameraPreviewSizeId).width, supportedCameraPreviewSizes.get(preferredCameraPreviewSizeId).height);
+        actualPreviewWidth = supportedCameraPreviewSizes.get(preferredCameraPreviewSizeId).width;
+        actualPreviewHeight = supportedCameraPreviewSizes.get(preferredCameraPreviewSizeId).height;
+
+        cameraParams.setPreviewSize(actualPreviewWidth, actualPreviewHeight);
         mCamera.setParameters(cameraParams);
     }
 
-    public void setCameraFrameListener(CameraFrameListener listener) {
-        mCameraFrameListener = listener;
+    public void setCameraFrameListener(ICameraFrameListener listener) {
+        mICameraFrameListener = listener;
     }
 
     @Override
     public void surfaceCreated(SurfaceHolder holder) {
         try {
             mCamera.setPreviewDisplay(holder);
+            mCamera.setPreviewCallback(this);
             mCamera.startPreview();
         } catch (IOException e) {
             e.printStackTrace();
@@ -74,6 +81,7 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
                 e.printStackTrace();
             }
 
+            mCamera.setPreviewCallback(null);
             mCamera.release();
             mCamera = null;
         }
@@ -81,7 +89,7 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
 
     @Override
     public void onPreviewFrame(byte[] data, Camera camera) {
-        if (mCameraFrameListener != null)
-            mCameraFrameListener.onCameraFrame(data);
+        if (mICameraFrameListener != null)
+            mICameraFrameListener.onCameraFrame(data, actualPreviewWidth, actualPreviewHeight);
     }
 }

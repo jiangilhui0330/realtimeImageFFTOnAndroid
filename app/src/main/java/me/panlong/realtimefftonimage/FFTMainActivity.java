@@ -1,13 +1,20 @@
 package me.panlong.realtimefftonimage;
 
 import android.app.Activity;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 
 
-public class FFTMainActivity extends Activity implements CameraFrameListener {
+public class FFTMainActivity extends Activity implements ICameraFrameListener {
     private CameraPreview mCameraPreview;
+    private MagnitudeSurfaceView mMagnitudeSurfaceView;
+    private PhaseSurfaceView mPhaseSurfaceView;
+    private ImageFFTProcessor mFFTProcessor;
+
+    private Bitmap mMagnitudeBitmap;
+    private Bitmap mPhaseBitmap;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -16,6 +23,11 @@ public class FFTMainActivity extends Activity implements CameraFrameListener {
 
         mCameraPreview = (CameraPreview) findViewById(R.id.surfaceView_cameraPreview);
         mCameraPreview.setCameraFrameListener(this);
+
+        mMagnitudeSurfaceView = (MagnitudeSurfaceView) findViewById(R.id.surfaceView_magnitude);
+        mPhaseSurfaceView = (PhaseSurfaceView) findViewById(R.id.surfaceView_phase);
+
+        mFFTProcessor = null;
     }
 
     @Override
@@ -41,7 +53,19 @@ public class FFTMainActivity extends Activity implements CameraFrameListener {
     }
 
     @Override
-    public void onCameraFrame(byte[] data) {
+    public void onCameraFrame(byte[] data, int width, int height) {
+        if (mFFTProcessor == null) {
+            mFFTProcessor = new ImageFFTProcessor(height, width);
+        }
 
+        double[][] convertedGrayScaleData = ImageFormatFactory.NV21ToGrayScaleDouble2DArray(data, width, height);
+
+        mFFTProcessor.readImageData(convertedGrayScaleData);
+
+        mMagnitudeBitmap = ImageFormatFactory.double2DArrayToBitmap(mFFTProcessor.getMagnitudeOfResult(), width, height);
+        mPhaseBitmap = ImageFormatFactory.double2DArrayToBitmap(mFFTProcessor.getPhaseOfResult(), width, height);
+
+        mMagnitudeSurfaceView.draw(mMagnitudeBitmap);
+        mPhaseSurfaceView.draw(mPhaseBitmap);
     }
 }

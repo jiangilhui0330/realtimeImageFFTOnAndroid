@@ -1,69 +1,73 @@
 package me.panlong.realtimefftonimage;
 
-import org.jtransforms.fft.DoubleFFT_2D;
+import android.util.Log;
+
+import edu.emory.mathcs.jtransforms.fft.DoubleFFT_2D;
 
 /**
  * Created by panlong on 11/1/15.
  */
 public class ImageFFTProcessor {
-    private static DoubleFFT_2D fftProcessor;
+    private static DoubleFFT_2D mFFTProcessor;
 
-    private double[][] imageData;
-    private int imageRows;
-    private int imageColumns;
-    private double[][] magnitudeOfResult;
-    private double[][] phaseOfResult;
+    private double[][] mImageData;
+    private int mImageRows;
+    private int mImageColumns;
+    private double[][] mMagnitudeOfResult;
+    private double[][] mPhaseOfResult;
 
-    public ImageFFTProcessor() {
-        imageData = null;
-        magnitudeOfResult = null;
-        phaseOfResult = null;
+    public ImageFFTProcessor(int rows, int columns) {
+        mFFTProcessor = new DoubleFFT_2D(rows, columns);
+
+        mImageRows = rows;
+        mImageColumns = columns;
+
+        mImageData = null;
+        mMagnitudeOfResult = null;
+        mPhaseOfResult = null;
     }
 
     public void readImageData(double[][] data) {
-        imageRows = data.length;
-        imageColumns = data[0].length;
-
-        imageData = new double[imageRows][imageColumns * 2];
-        for (int i = 0; i < imageRows; i++) {
-            for (int j = 0; j < imageColumns; j++) {
-                imageData[i][2 * j] = data[i][j];
-                imageData[i][2 * j + 1] = 0.0;
+        mImageData = new double[mImageRows][mImageColumns * 2];
+        for (int i = 0; i < mImageRows; i++) {
+            for (int j = 0; j < mImageColumns; j++) {
+                mImageData[i][2 * j] = data[i][j];
+                mImageData[i][2 * j + 1] = 0.0;
             }
         }
 
-        magnitudeOfResult = null;
-        phaseOfResult = null;
+        mMagnitudeOfResult = null;
+        mPhaseOfResult = null;
     }
 
     public double[][] getMagnitudeOfResult() {
-        if (magnitudeOfResult == null) {
+        if (mMagnitudeOfResult == null) {
             performFFT();
         }
-        return magnitudeOfResult;
+        return mMagnitudeOfResult;
     }
 
     public double[][] getPhaseOfResult() {
-        if (phaseOfResult == null) {
+        if (mPhaseOfResult == null) {
             performFFT();
         }
-        return phaseOfResult;
+        return mPhaseOfResult;
     }
 
     private void performFFT() {
-        fftProcessor.complexForward(imageData);
+        mFFTProcessor.complexForward(mImageData);
 
-        imageData = shiftOrigin(imageData);
-        magnitudeOfResult = new double[imageRows][imageColumns];
-        phaseOfResult = new double[imageRows][imageColumns];
+        mImageData = shiftOrigin(mImageData);
+        mMagnitudeOfResult = new double[mImageRows][mImageColumns];
+        mPhaseOfResult = new double[mImageRows][mImageColumns];
 
-        for (int i = 0; i < imageRows; i++) {
-            for (int j = 0; j < imageColumns; j++) {
-                double re = imageData[i][2 * j];
-                double im = imageData[i][2 * j + 1];
+        for (int i = 0; i < mImageRows; i++) {
+            for (int j = 0; j < mImageColumns; j++) {
+                double re = mImageData[i][2 * j];
+                double im = mImageData[i][2 * j + 1];
 
-                magnitudeOfResult[i][j] = Math.log(re * re + im * im + 0.01);
-                phaseOfResult[i][j] = Math.atan2(im, re);
+                mMagnitudeOfResult[i][j] = Math.sqrt(re * re + im * im);
+                mPhaseOfResult[i][j] = Math.atan2(im, re) / Math.PI * 255;
             }
         }
     }
