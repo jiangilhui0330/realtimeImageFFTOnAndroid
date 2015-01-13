@@ -23,8 +23,8 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
     private int actualPreviewWidth;
     private int actualPreviewHeight;
 
-    public CameraPreview(Context context, AttributeSet attrs) {
-        super(context, attrs);
+    public CameraPreview(Context context) {
+        super(context);
 
         Camera camera = CameraUtils.getCameraInstance();
 
