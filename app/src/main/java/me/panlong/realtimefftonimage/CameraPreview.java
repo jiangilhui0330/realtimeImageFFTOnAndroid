@@ -27,7 +27,10 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
         super(context, attrs);
 
         Camera camera = CameraUtils.getCameraInstance();
-        setCamera(camera);
+
+        if (camera != null) {
+            setCamera(camera);
+        }
     }
 
     public void setCamera(Camera camera) {
