@@ -35,8 +35,8 @@ public class DrawingView extends View {
 
         mChosenRecWidth = DEFAULT_REC_WIDTH;
         mChosenRecHeight = DEFAULT_REC_HEIGHT;
-        mChosenRecCenterX = this.getWidth() / 2;
-        mChosenRecCenterY = this.getHeight() / 2;
+        mChosenRecCenterX = DEFAULT_REC_WIDTH / 2;
+        mChosenRecCenterY = DEFAULT_REC_HEIGHT / 2;
 
         isDrawing = false;
 
@@ -97,6 +97,7 @@ public class DrawingView extends View {
 
     public void setChosenAreaChangedListener(IChosenRecChangedListener listener) {
         mChosenAreaChangedListener = listener;
+        notifyChosenRecChangedListener();
     }
 
     @Override

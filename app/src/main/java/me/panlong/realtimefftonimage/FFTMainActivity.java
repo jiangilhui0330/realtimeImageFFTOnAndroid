@@ -3,6 +3,7 @@ package me.panlong.realtimefftonimage;
 import android.app.Activity;
 import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -141,6 +142,32 @@ public class FFTMainActivity extends Activity implements ICameraFrameListener, I
     public void onCameraFrame(byte[] data, int width, int height) {
         if (mIsStarted) {
             if (mFFTProcessor == null) {
+                mFFTProcessor = new ImageFFTProcessor(height, width);
+            }
+
+            if (mIsChosenArea) {
+                mFFTProcessor = new ImageFFTProcessor(mChosenRecHeight, mChosenRecWidth);
+
+
+                for (int i = 0; i < mChosenRecHeight; i ++) {
+                    for (int j = 0; j < mChosenRecWidth; j ++) {
+                        int chosenImageX = j + mChosenRecTopLeftX;
+                        int chosenImageY = i + mChosenRecTopLeftY;
+
+                        Log.d("debug", "width: " + width);
+                        Log.d("debug", "height: " + height);
+                        Log.d("debug", "recHeight: " + mChosenRecHeight);
+                        Log.d("debug", "recWidth: " + mChosenRecWidth);
+                        Log.d("debug", "x: " + mChosenRecTopLeftX);
+                        Log.d("debug", "y: " + mChosenRecTopLeftY);
+
+                        data[i * mChosenRecWidth + j] = data[chosenImageY * width + chosenImageX];
+                    }
+                }
+
+                width = mChosenRecWidth;
+                height = mChosenRecHeight;
+            } else {
                 mFFTProcessor = new ImageFFTProcessor(height, width);
             }
 
