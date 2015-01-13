@@ -7,34 +7,50 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.FrameLayout;
 
 
-public class FFTMainActivity extends Activity implements ICameraFrameListener {
+public class FFTMainActivity extends Activity implements ICameraFrameListener, IChosenRecChangedListener {
+    public static final int DEFAULT_REC_WIDTH = 32;
+    public static final int DEFAULT_REC_HEIGHT = 24;
+
     private CameraPreview mCameraPreview;
+    private DrawingView mDrawingSurface;
     private MagnitudeSurfaceView mMagnitudeSurfaceView;
     private PhaseSurfaceView mPhaseSurfaceView;
 
     private Button mPauseAndResumeBtn;
+    private Button mChooseAreaBtn;
     private Boolean mIsStarted;
+    private Boolean mIsChosenArea;
 
     private ImageFFTProcessor mFFTProcessor;
 
     private Bitmap mMagnitudeBitmap;
     private Bitmap mPhaseBitmap;
 
+    private int mChosenRecTopLeftX;
+    private int mChosenRecTopLeftY;
+    private int mChosenRecWidth;
+    private int mChosenRecHeight;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_fftmain);
 
-        mCameraPreview = (CameraPreview) findViewById(R.id.surfaceView_cameraPreview);
-        mCameraPreview.setCameraFrameListener(this);
+        initPreviewFrameLayout();
 
-        mMagnitudeSurfaceView = (MagnitudeSurfaceView) findViewById(R.id.surfaceView_magnitude);
-        mPhaseSurfaceView = (PhaseSurfaceView) findViewById(R.id.surfaceView_phase);
+        initMagAndPhaseViews();
+
+        initButtons();
 
         mIsStarted = false;
+        mIsChosenArea = false;
+        mFFTProcessor = null;
+    }
 
+    private void initButtons() {
         mPauseAndResumeBtn = (Button) findViewById(R.id.button_startFFT);
         mPauseAndResumeBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -48,7 +64,40 @@ public class FFTMainActivity extends Activity implements ICameraFrameListener {
             }
         });
 
-        mFFTProcessor = null;
+        mChooseAreaBtn = (Button) findViewById(R.id.button_chooseArea);
+        mChooseAreaBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mIsChosenArea = !mIsChosenArea;
+                if (mIsChosenArea) {
+                    mDrawingSurface.startDrawing(mChosenRecTopLeftX, mChosenRecTopLeftY, mChosenRecWidth, mChosenRecHeight);
+                } else {
+                    mDrawingSurface.stopDrawing();
+                }
+            }
+        });
+    }
+
+    private void initMagAndPhaseViews() {
+        mMagnitudeSurfaceView = (MagnitudeSurfaceView) findViewById(R.id.surfaceView_magnitude);
+        mPhaseSurfaceView = (PhaseSurfaceView) findViewById(R.id.surfaceView_phase);
+    }
+
+    private void initPreviewFrameLayout() {
+        FrameLayout cameraPreviewFrame = (FrameLayout) findViewById(R.id.frameLayout_cameraPreview);
+        mChosenRecWidth = DEFAULT_REC_WIDTH;
+        mChosenRecHeight = DEFAULT_REC_HEIGHT;
+        mChosenRecTopLeftX = cameraPreviewFrame.getWidth() / 2 - mChosenRecWidth / 2;
+        mChosenRecTopLeftY = cameraPreviewFrame.getHeight() / 2 - mChosenRecHeight / 2;
+
+        mCameraPreview = new CameraPreview(this);
+        mCameraPreview.setCameraFrameListener(this);
+
+        mDrawingSurface = new DrawingView(this);
+        mDrawingSurface.setChosenAreaChangedListener(this);
+
+        cameraPreviewFrame.addView(mCameraPreview);
+        cameraPreviewFrame.addView(mDrawingSurface);
     }
 
     @Override
@@ -93,5 +142,13 @@ public class FFTMainActivity extends Activity implements ICameraFrameListener {
             mMagnitudeBitmap.recycle();
             mPhaseBitmap.recycle();
         }
+    }
+
+    @Override
+    public void chosenRecChanged(int topLeftX, int topLeftY, int width, int height) {
+        mChosenRecTopLeftX = topLeftX;
+        mChosenRecTopLeftY = topLeftY;
+        mChosenRecWidth = width;
+        mChosenRecHeight = height;
     }
 }

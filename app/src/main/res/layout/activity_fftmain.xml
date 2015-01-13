@@ -7,10 +7,10 @@
     android:keepScreenOn="true"
     android:background="@color/background_material_light" >
 
-    <me.panlong.realtimefftonimage.CameraPreview
+    <FrameLayout
         android:layout_width="320dp"
         android:layout_height="240dp"
-        android:id="@+id/surfaceView_cameraPreview"
+        android:id="@+id/frameLayout_cameraPreview"
         android:layout_alignParentTop="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true" />
@@ -20,7 +20,7 @@
         android:layout_height="120dp"
         android:id="@+id/surfaceView_magnitude"
         android:layout_marginTop="25dp"
-        android:layout_alignTop="@+id/surfaceView_cameraPreview"
+        android:layout_alignTop="@+id/frameLayout_cameraPreview"
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true" />
 
@@ -38,7 +38,7 @@
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:text="Magnitude"
         android:id="@+id/textView_magnitude"
-        android:layout_alignTop="@+id/surfaceView_cameraPreview"
+        android:layout_alignTop="@+id/frameLayout_cameraPreview"
         android:layout_alignRight="@+id/surfaceView_magnitude"
         android:layout_alignEnd="@+id/surfaceView_magnitude"
         android:textColor="@color/primary_material_dark" />
@@ -73,6 +73,6 @@
         android:layout_marginRight="19dp"
         android:layout_marginEnd="19dp"
         android:layout_alignBottom="@+id/surfaceView_phase"
-        android:layout_alignRight="@+id/surfaceView_cameraPreview"
-        android:layout_alignEnd="@+id/surfaceView_cameraPreview" />
+        android:layout_alignRight="@+id/frameLayout_cameraPreview"
+        android:layout_alignEnd="@+id/frameLayout_cameraPreview" />
 </RelativeLayout>
