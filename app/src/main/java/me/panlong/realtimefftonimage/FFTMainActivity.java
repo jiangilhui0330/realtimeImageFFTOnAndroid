@@ -11,9 +11,6 @@ import android.widget.FrameLayout;
 
 
 public class FFTMainActivity extends Activity implements ICameraFrameListener, IChosenRecChangedListener {
-    public static final int DEFAULT_REC_WIDTH = 32;
-    public static final int DEFAULT_REC_HEIGHT = 24;
-
     private CameraPreview mCameraPreview;
     private DrawingView mDrawingSurface;
     private MagnitudeSurfaceView mMagnitudeSurfaceView;
@@ -21,6 +18,8 @@ public class FFTMainActivity extends Activity implements ICameraFrameListener, I
 
     private Button mPauseAndResumeBtn;
     private Button mChooseAreaBtn;
+    private Button mIncreaseRecBtn;
+    private Button mDecreaseRecBtn;
     private Boolean mIsStarted;
     private Boolean mIsChosenArea;
 
@@ -70,9 +69,29 @@ public class FFTMainActivity extends Activity implements ICameraFrameListener, I
             public void onClick(View v) {
                 mIsChosenArea = !mIsChosenArea;
                 if (mIsChosenArea) {
-                    mDrawingSurface.startDrawing(mChosenRecTopLeftX, mChosenRecTopLeftY, mChosenRecWidth, mChosenRecHeight);
+                    mDrawingSurface.startDrawing();
                 } else {
                     mDrawingSurface.stopDrawing();
+                }
+            }
+        });
+
+        mIncreaseRecBtn = (Button) findViewById(R.id.button_increaseRec);
+        mIncreaseRecBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (mIsChosenArea) {
+                    mDrawingSurface.increaseRecSize();
+                }
+            }
+        });
+
+        mDecreaseRecBtn = (Button) findViewById(R.id.button_decreaseRec);
+        mDecreaseRecBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (mIsChosenArea) {
+                    mDrawingSurface.decreaseRecSize();
                 }
             }
         });
@@ -85,10 +104,6 @@ public class FFTMainActivity extends Activity implements ICameraFrameListener, I
 
     private void initPreviewFrameLayout() {
         FrameLayout cameraPreviewFrame = (FrameLayout) findViewById(R.id.frameLayout_cameraPreview);
-        mChosenRecWidth = DEFAULT_REC_WIDTH;
-        mChosenRecHeight = DEFAULT_REC_HEIGHT;
-        mChosenRecTopLeftX = cameraPreviewFrame.getWidth() / 2 - mChosenRecWidth / 2;
-        mChosenRecTopLeftY = cameraPreviewFrame.getHeight() / 2 - mChosenRecHeight / 2;
 
         mCameraPreview = new CameraPreview(this);
         mCameraPreview.setCameraFrameListener(this);

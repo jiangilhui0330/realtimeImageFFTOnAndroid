@@ -12,6 +12,12 @@ import android.view.View;
  */
 public class DrawingView extends View {
     public static final float PAINT_STROKE_WIDTH = 3f;
+    public static final int DEFAULT_REC_WIDTH = 32;
+    public static final int DEFAULT_REC_HEIGHT = 24;
+    public static final int REC_WIDTH_INCREASE_UNIT = 32;
+    public static final int REC_HEIGHT_INCREASES_UNIT = 24;
+    public static final int MIN_CHOSEN_REC_WIDTH = 32;
+    public static final int MIN_CHOSEN_REC_HEIGHT = 24;
 
     private IChosenRecChangedListener mChosenAreaChangedListener;
 
@@ -27,8 +33,10 @@ public class DrawingView extends View {
     public DrawingView(Context context) {
         super(context);
 
-        mChosenRecWidth = -1;
-        mChosenRecHeight = -1;
+        mChosenRecWidth = DEFAULT_REC_WIDTH;
+        mChosenRecHeight = DEFAULT_REC_HEIGHT;
+        mChosenRecCenterX = this.getWidth() / 2;
+        mChosenRecCenterY = this.getHeight() / 2;
 
         isDrawing = false;
 
@@ -44,17 +52,48 @@ public class DrawingView extends View {
         mPaint.setStyle(Paint.Style.STROKE);
     }
 
-    public void setChosenRecWidth(int width) {
-        mChosenRecWidth = width;
+    public void increaseRecSize() {
+        setChosenRecSize(mChosenRecWidth + REC_WIDTH_INCREASE_UNIT,
+                mChosenRecHeight + REC_HEIGHT_INCREASES_UNIT);
+
         invalidate();
         notifyChosenRecChangedListener();
     }
 
-    public void setChosenRecHeight(int height) {
-        mChosenRecHeight = height;
-            invalidate();
-            notifyChosenRecChangedListener();
+    public void decreaseRecSize() {
+        setChosenRecSize(mChosenRecWidth - REC_WIDTH_INCREASE_UNIT,
+                mChosenRecHeight - REC_HEIGHT_INCREASES_UNIT);
+
+        invalidate();
+        notifyChosenRecChangedListener();
+    }
+
+    private Boolean isRecSizePossibleToSet(int width, int height) {
+        if (width < MIN_CHOSEN_REC_WIDTH) {
+            return false;
         }
+
+        if ((mChosenRecCenterX - width / 2 < 0) || (mChosenRecCenterX + width / 2 > this.getWidth())) {
+            return false;
+        }
+
+        if (height < MIN_CHOSEN_REC_HEIGHT) {
+            return false;
+        }
+
+        if ((mChosenRecCenterY - height / 2 < 0) || (mChosenRecCenterY + height / 2 > this.getHeight())) {
+            return false;
+        }
+
+        return true;
+    }
+
+    private void setChosenRecSize(int width, int height) {
+        if (isRecSizePossibleToSet(width, height)) {
+            mChosenRecWidth = width;
+            mChosenRecHeight = height;
+        }
+    }
 
     public void setChosenAreaChangedListener(IChosenRecChangedListener listener) {
         mChosenAreaChangedListener = listener;
@@ -68,10 +107,14 @@ public class DrawingView extends View {
             switch (motionAction) {
                 case MotionEvent.ACTION_DOWN:
                 case MotionEvent.ACTION_MOVE:
-                    calculateCoorsFromAction(event);
+                    int viewX = (int) (event.getX() - this.getLeft());
+                    int viewY = (int) (event.getY() - this.getTop());
+
+                    setCenter(viewX, viewY);
                     invalidate();
                     notifyChosenRecChangedListener();
                     break;
+
                 default:
                     break;
             }
@@ -80,24 +123,21 @@ public class DrawingView extends View {
         return true;
     }
 
-    private void calculateCoorsFromAction(MotionEvent event) {
-        int viewX = (int) (event.getX() - this.getLeft());
-        int viewY = (int) (event.getY() - this.getTop());
-
-        if (viewX - mChosenRecWidth / 2 < 0) {
+    private void setCenter(int x, int y) {
+        if (x - mChosenRecWidth / 2 < 0) {
             mChosenRecCenterX = mChosenRecWidth / 2;
-        } else if (viewX + mChosenRecWidth / 2 > this.getWidth()) {
+        } else if (x + mChosenRecWidth / 2 > this.getWidth()) {
             mChosenRecCenterX = this.getWidth() - mChosenRecWidth / 2;
         } else {
-            mChosenRecCenterX = viewX;
+            mChosenRecCenterX = x;
         }
 
-        if (viewY - mChosenRecHeight / 2 < 0) {
+        if (y - mChosenRecHeight / 2 < 0) {
             mChosenRecCenterY = mChosenRecHeight / 2;
-        } else if (viewY + mChosenRecHeight / 2 > this.getHeight()) {
+        } else if (y + mChosenRecHeight / 2 > this.getHeight()) {
             mChosenRecCenterY = this.getHeight() - mChosenRecHeight / 2;
         } else {
-            mChosenRecCenterY = viewY;
+            mChosenRecCenterY = y;
         }
     }
 
@@ -109,12 +149,7 @@ public class DrawingView extends View {
         }
     }
 
-    public void startDrawing(int topLeftX, int topLeftY, int width, int height) {
-        mChosenRecWidth = width;
-        mChosenRecHeight = height;
-        mChosenRecCenterX = topLeftX + mChosenRecWidth / 2;
-        mChosenRecCenterY = topLeftY + mChosenRecHeight / 2;
-
+    public void startDrawing() {
         isDrawing = true;
         invalidate();
     }

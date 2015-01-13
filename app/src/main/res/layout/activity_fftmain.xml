@@ -75,4 +75,22 @@
         android:layout_alignBottom="@+id/surfaceView_phase"
         android:layout_alignRight="@+id/frameLayout_cameraPreview"
         android:layout_alignEnd="@+id/frameLayout_cameraPreview" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="+"
+        android:id="@+id/button_increaseRec"
+        android:layout_above="@+id/button_decreaseRec"
+        android:layout_toRightOf="@+id/frameLayout_cameraPreview"
+        android:layout_toEndOf="@+id/frameLayout_cameraPreview" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="-"
+        android:id="@+id/button_decreaseRec"
+        android:layout_alignBottom="@+id/surfaceView_phase"
+        android:layout_toRightOf="@+id/button_chooseArea"
+        android:layout_toEndOf="@+id/button_chooseArea" />
 </RelativeLayout>
