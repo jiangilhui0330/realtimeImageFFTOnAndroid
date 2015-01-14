@@ -34,8 +34,7 @@ public class ImageFFTProcessor {
             }
         }
 
-        mMagnitudeOfResult = null;
-        mPhaseOfResult = null;
+        performFFT();
     }
 
     public double[][] getMagnitudeOfResult() {

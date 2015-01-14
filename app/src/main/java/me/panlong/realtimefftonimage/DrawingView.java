@@ -12,8 +12,8 @@ import android.view.View;
  */
 public class DrawingView extends View {
     public static final float PAINT_STROKE_WIDTH = 3f;
-    public static final int DEFAULT_REC_WIDTH = 32;
-    public static final int DEFAULT_REC_HEIGHT = 24;
+    public static final int DEFAULT_REC_WIDTH = 128;
+    public static final int DEFAULT_REC_HEIGHT = 96;
     public static final int REC_WIDTH_INCREASE_UNIT = 32;
     public static final int REC_HEIGHT_INCREASES_UNIT = 24;
     public static final int MIN_CHOSEN_REC_WIDTH = 32;
@@ -32,11 +32,6 @@ public class DrawingView extends View {
 
     public DrawingView(Context context) {
         super(context);
-
-        mChosenRecWidth = DEFAULT_REC_WIDTH;
-        mChosenRecHeight = DEFAULT_REC_HEIGHT;
-        mChosenRecCenterX = DEFAULT_REC_WIDTH / 2;
-        mChosenRecCenterY = DEFAULT_REC_HEIGHT / 2;
 
         isDrawing = false;
 
@@ -69,19 +64,11 @@ public class DrawingView extends View {
     }
 
     private Boolean isRecSizePossibleToSet(int width, int height) {
-        if (width < MIN_CHOSEN_REC_WIDTH) {
+        if (width < MIN_CHOSEN_REC_WIDTH || width > this.getWidth()) {
             return false;
         }
 
-        if ((mChosenRecCenterX - width / 2 < 0) || (mChosenRecCenterX + width / 2 > this.getWidth())) {
-            return false;
-        }
-
-        if (height < MIN_CHOSEN_REC_HEIGHT) {
-            return false;
-        }
-
-        if ((mChosenRecCenterY - height / 2 < 0) || (mChosenRecCenterY + height / 2 > this.getHeight())) {
+        if (height < MIN_CHOSEN_REC_HEIGHT || height > this.getHeight()) {
             return false;
         }
 
@@ -92,12 +79,31 @@ public class DrawingView extends View {
         if (isRecSizePossibleToSet(width, height)) {
             mChosenRecWidth = width;
             mChosenRecHeight = height;
+
+            if (mChosenRecCenterX - mChosenRecWidth / 2 < 0) {
+                mChosenRecCenterX = mChosenRecWidth / 2;
+            } else if (mChosenRecCenterX + mChosenRecWidth / 2 > this.getWidth()) {
+                mChosenRecCenterX = this.getWidth() - mChosenRecWidth / 2;
+            }
+
+            if (mChosenRecCenterY - mChosenRecHeight / 2 < 0) {
+                mChosenRecCenterY = mChosenRecHeight / 2;
+            } else if (mChosenRecCenterY + mChosenRecHeight / 2 > this.getHeight()) {
+                mChosenRecCenterY = this.getHeight() - mChosenRecHeight / 2;
+            }
         }
     }
 
     public void setChosenAreaChangedListener(IChosenRecChangedListener listener) {
         mChosenAreaChangedListener = listener;
         notifyChosenRecChangedListener();
+    }
+
+    private void setDefaultRec() {
+        mChosenRecWidth = DEFAULT_REC_WIDTH;
+        mChosenRecHeight = DEFAULT_REC_HEIGHT;
+        mChosenRecCenterX = this.getWidth() / 2;
+        mChosenRecCenterY = this.getHeight() / 2;
     }
 
     @Override
@@ -152,7 +158,10 @@ public class DrawingView extends View {
 
     public void startDrawing() {
         isDrawing = true;
+        setDefaultRec();
+
         invalidate();
+        notifyChosenRecChangedListener();
     }
 
     public void stopDrawing() {

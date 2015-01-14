@@ -60,37 +60,33 @@
         android:text="Resume/Pause"
         android:id="@+id/button_startFFT"
         android:layout_alignTop="@+id/button_chooseArea"
-        android:layout_toLeftOf="@+id/button_chooseArea"
-        android:layout_toStartOf="@+id/button_chooseArea"
-        android:layout_marginRight="19dp"
-        android:layout_marginEnd="19dp" />
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
 
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Choose Area"
         android:id="@+id/button_chooseArea"
-        android:layout_marginRight="19dp"
-        android:layout_marginEnd="19dp"
-        android:layout_alignBottom="@+id/surfaceView_phase"
+        android:layout_alignTop="@+id/button_increaseRec"
+        android:layout_toLeftOf="@+id/button_increaseRec"
+        android:layout_toStartOf="@+id/button_increaseRec" />
+
+    <Button
+        android:layout_width="50dp"
+        android:layout_height="wrap_content"
+        android:text="+"
+        android:id="@+id/button_increaseRec"
+        android:layout_alignParentBottom="true"
         android:layout_alignRight="@+id/frameLayout_cameraPreview"
         android:layout_alignEnd="@+id/frameLayout_cameraPreview" />
 
     <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="+"
-        android:id="@+id/button_increaseRec"
-        android:layout_above="@+id/button_decreaseRec"
-        android:layout_toRightOf="@+id/frameLayout_cameraPreview"
-        android:layout_toEndOf="@+id/frameLayout_cameraPreview" />
-
-    <Button
-        android:layout_width="wrap_content"
+        android:layout_width="50dp"
         android:layout_height="wrap_content"
         android:text="-"
         android:id="@+id/button_decreaseRec"
-        android:layout_alignBottom="@+id/surfaceView_phase"
-        android:layout_toRightOf="@+id/button_chooseArea"
-        android:layout_toEndOf="@+id/button_chooseArea" />
+        android:layout_alignTop="@+id/button_startFFT"
+        android:layout_toLeftOf="@+id/button_chooseArea"
+        android:layout_toStartOf="@+id/button_chooseArea" />
 </RelativeLayout>

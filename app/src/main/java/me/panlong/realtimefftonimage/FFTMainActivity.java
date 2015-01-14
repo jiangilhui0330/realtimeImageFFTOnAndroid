@@ -3,7 +3,6 @@ package me.panlong.realtimefftonimage;
 import android.app.Activity;
 import android.graphics.Bitmap;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -146,27 +145,25 @@ public class FFTMainActivity extends Activity implements ICameraFrameListener, I
             }
 
             if (mIsChosenArea) {
-                mFFTProcessor = new ImageFFTProcessor(mChosenRecHeight, mChosenRecWidth);
+                double scaledFactor = width * 1.0 / mDrawingSurface.getWidth();
+                int scaledTopLeftX = (int) (mChosenRecTopLeftX * scaledFactor);
+                int scaledTopLeftY = (int) (mChosenRecTopLeftY * scaledFactor);
+                int scaledRecWidth = (int) (mChosenRecWidth * scaledFactor);
+                int scaledRecHeight = (int) (mChosenRecHeight * scaledFactor);
 
+                mFFTProcessor = new ImageFFTProcessor(scaledRecHeight, scaledRecWidth);
 
-                for (int i = 0; i < mChosenRecHeight; i ++) {
-                    for (int j = 0; j < mChosenRecWidth; j ++) {
-                        int chosenImageX = j + mChosenRecTopLeftX;
-                        int chosenImageY = i + mChosenRecTopLeftY;
+                for (int i = 0; i < scaledRecHeight; i++) {
+                    for (int j = 0; j < scaledRecWidth; j++) {
+                        int chosenImageX = j + scaledTopLeftX;
+                        int chosenImageY = i + scaledTopLeftY;
 
-                        Log.d("debug", "width: " + width);
-                        Log.d("debug", "height: " + height);
-                        Log.d("debug", "recHeight: " + mChosenRecHeight);
-                        Log.d("debug", "recWidth: " + mChosenRecWidth);
-                        Log.d("debug", "x: " + mChosenRecTopLeftX);
-                        Log.d("debug", "y: " + mChosenRecTopLeftY);
-
-                        data[i * mChosenRecWidth + j] = data[chosenImageY * width + chosenImageX];
+                        data[i * scaledRecWidth + j] = data[chosenImageY * width + chosenImageX];
                     }
                 }
 
-                width = mChosenRecWidth;
-                height = mChosenRecHeight;
+                width = scaledRecWidth;
+                height = scaledRecHeight;
             } else {
                 mFFTProcessor = new ImageFFTProcessor(height, width);
             }
