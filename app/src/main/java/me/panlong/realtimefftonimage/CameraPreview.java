@@ -83,7 +83,6 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
                 e.printStackTrace();
             }
 
-            mCamera.setPreviewCallback(null);
             mCamera.release();
             mCamera = null;
         }
@@ -103,6 +102,7 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
 
     public void resumeCameraPreview() {
         if (mCamera != null) {
+            mCamera.setPreviewCallback(this);
             mCamera.startPreview();
         }
     }
