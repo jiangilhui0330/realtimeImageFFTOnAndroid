@@ -58,13 +58,28 @@ public class ImageFFTProcessor {
         mMagnitudeOfResult = new double[mImageRows][mImageColumns];
         mPhaseOfResult = new double[mImageRows][mImageColumns];
 
+        double maxMag = 0;
+        double maxPhase = 0;
+
         for (int i = 0; i < mImageRows; i++) {
             for (int j = 0; j < mImageColumns; j++) {
                 double re = mImageData[i][2 * j];
                 double im = mImageData[i][2 * j + 1];
 
-                mMagnitudeOfResult[i][j] = Math.sqrt(re * re + im * im);
-                int pixel = (int) (Math.abs(Math.atan2(im, re)) / Math.PI * 255);
+                mMagnitudeOfResult[i][j] = Math.log(re * re + im * im + 0.01);
+                maxMag = Math.max(mMagnitudeOfResult[i][j], maxMag);
+
+                mPhaseOfResult[i][j] = Math.abs(Math.atan2(im, re));
+                maxPhase = Math.max(mPhaseOfResult[i][j], maxPhase);
+            }
+        }
+
+        for (int i = 0; i < mImageRows; i ++) {
+            for (int j = 0; j < mImageColumns; j ++) {
+                int pixel = (int) (mMagnitudeOfResult[i][j] / maxMag * 255);
+                mMagnitudeOfResult[i][j] = (double) (0xff000000 | pixel << 16 | pixel << 8 | pixel);
+
+                pixel = (int) (mPhaseOfResult[i][j] / maxPhase * 255);
                 mPhaseOfResult[i][j] = (double) (0xff000000 | pixel << 16 | pixel << 8 | pixel);
             }
         }
