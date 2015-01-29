@@ -12,8 +12,8 @@ import android.widget.FrameLayout;
 import me.panlong.realtimefftonimage.camera.CameraPreview;
 import me.panlong.realtimefftonimage.camera.ICameraFrameListener;
 import me.panlong.realtimefftonimage.fft.ImageFFTProcessor;
-import me.panlong.realtimefftonimage.resultView.DrawingView;
 import me.panlong.realtimefftonimage.resultView.IChosenRecChangedListener;
+import me.panlong.realtimefftonimage.resultView.InteractiveView;
 import me.panlong.realtimefftonimage.resultView.MagnitudeSurfaceView;
 import me.panlong.realtimefftonimage.resultView.PhaseSurfaceView;
 import me.panlong.realtimefftonimage.utils.BitmapWorker;
@@ -22,7 +22,7 @@ import me.panlong.realtimefftonimage.utils.ImageFormatFactory;
 
 public class FFTMainActivity extends Activity implements ICameraFrameListener, IChosenRecChangedListener {
     private CameraPreview mCameraPreview;
-    private DrawingView mDrawingSurface;
+    private InteractiveView mInteractiveView;
     private MagnitudeSurfaceView mMagnitudeSurfaceView;
     private PhaseSurfaceView mPhaseSurfaceView;
 
@@ -30,8 +30,10 @@ public class FFTMainActivity extends Activity implements ICameraFrameListener, I
     private Button mChooseAreaBtn;
     private Button mIncreaseRecBtn;
     private Button mDecreaseRecBtn;
+    private Button mInverseBtn;
     private Boolean mIsStarted;
     private Boolean mIsChosenArea;
+    private Boolean mIsDrawingInverse;
 
     private ImageFFTProcessor mFFTProcessor;
 
@@ -56,6 +58,7 @@ public class FFTMainActivity extends Activity implements ICameraFrameListener, I
 
         mIsStarted = false;
         mIsChosenArea = false;
+        mIsDrawingInverse = false;
         mFFTProcessor = null;
     }
 
@@ -79,9 +82,9 @@ public class FFTMainActivity extends Activity implements ICameraFrameListener, I
             public void onClick(View v) {
                 mIsChosenArea = !mIsChosenArea;
                 if (mIsChosenArea) {
-                    mDrawingSurface.startDrawing();
+                    mInteractiveView.startDrawingRec();
                 } else {
-                    mDrawingSurface.stopDrawing();
+                    mInteractiveView.stopDrawingRec();
                 }
             }
         });
@@ -91,7 +94,7 @@ public class FFTMainActivity extends Activity implements ICameraFrameListener, I
             @Override
             public void onClick(View v) {
                 if (mIsChosenArea) {
-                    mDrawingSurface.increaseRecSize();
+                    mInteractiveView.increaseRecSize();
                 }
             }
         });
@@ -101,7 +104,20 @@ public class FFTMainActivity extends Activity implements ICameraFrameListener, I
             @Override
             public void onClick(View v) {
                 if (mIsChosenArea) {
-                    mDrawingSurface.decreaseRecSize();
+                    mInteractiveView.decreaseRecSize();
+                }
+            }
+        });
+
+        mInverseBtn = (Button) findViewById(R.id.button_inverse);
+        mInverseBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mIsDrawingInverse = !mIsDrawingInverse;
+                if (mIsDrawingInverse) {
+                    mInteractiveView.startDrawingBitmap();
+                } else {
+                    mInteractiveView.stopDrawingBitmap();
                 }
             }
         });
@@ -118,11 +134,11 @@ public class FFTMainActivity extends Activity implements ICameraFrameListener, I
         mCameraPreview = new CameraPreview(this);
         mCameraPreview.setCameraFrameListener(this);
 
-        mDrawingSurface = new DrawingView(this);
-        mDrawingSurface.setChosenAreaChangedListener(this);
+        mInteractiveView = new InteractiveView(this);
+        mInteractiveView.setChosenAreaChangedListener(this);
 
         cameraPreviewFrame.addView(mCameraPreview);
-        cameraPreviewFrame.addView(mDrawingSurface);
+        cameraPreviewFrame.addView(mInteractiveView);
     }
 
     @Override
@@ -150,12 +166,8 @@ public class FFTMainActivity extends Activity implements ICameraFrameListener, I
     @Override
     public void onCameraFrame(byte[] data, int width, int height) {
         if (mIsStarted) {
-            if (mFFTProcessor == null) {
-                mFFTProcessor = new ImageFFTProcessor(height, width);
-            }
-
             if (mIsChosenArea) {
-                double scaledFactor = width * 1.0 / mDrawingSurface.getWidth();
+                double scaledFactor = width * 1.0 / mInteractiveView.getWidth();
                 int scaledTopLeftX = (int) (mChosenRecTopLeftX * scaledFactor);
                 int scaledTopLeftY = (int) (mChosenRecTopLeftY * scaledFactor);
                 int scaledRecWidth = (int) (mChosenRecWidth * scaledFactor);
@@ -187,12 +199,11 @@ public class FFTMainActivity extends Activity implements ICameraFrameListener, I
 
             magWorker.execute(mFFTProcessor.getMagnitudeOfResult());
             phaseWorker.execute(mFFTProcessor.getPhaseOfResult());
-//            mMagnitudeBitmap = ImageFormatFactory.double2DArrayToBitmap(mFFTProcessor.getMagnitudeOfResult(), width, height);
 
-//            mPhaseBitmap = ImageFormatFactory.double2DArrayToBitmap(mFFTProcessor.getPhaseOfResult(), width, height);
-
-//            mMagnitudeSurfaceView.draw(mMagnitudeBitmap);
-//            mPhaseSurfaceView.draw(mPhaseBitmap);
+            if (mIsDrawingInverse) {
+                BitmapWorker inverseWorker = new BitmapWorker(mInteractiveView, width, height);
+                inverseWorker.execute(mFFTProcessor.getFFTInverse());
+            }
         }
     }
 

@@ -89,4 +89,13 @@
         android:layout_alignTop="@+id/button_startFFT"
         android:layout_toLeftOf="@+id/button_chooseArea"
         android:layout_toStartOf="@+id/button_chooseArea" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Inverse"
+        android:id="@+id/button_inverse"
+        android:layout_alignParentBottom="true"
+        android:layout_toLeftOf="@+id/surfaceView_phase"
+        android:layout_toStartOf="@+id/surfaceView_phase" />
 </RelativeLayout>

@@ -1,5 +1,9 @@
 package me.panlong.realtimefftonimage.fft;
 
+import android.util.Log;
+
+import java.util.Arrays;
+
 import edu.emory.mathcs.jtransforms.fft.DoubleFFT_2D;
 
 /**
@@ -9,6 +13,8 @@ public class ImageFFTProcessor {
     private static DoubleFFT_2D mFFTProcessor;
 
     private double[][] mImageData;
+    private double[][] mFFTResultData;
+    private double[][] mFFTInverseImageData;
     private int mImageRows;
     private int mImageColumns;
     private double[][] mMagnitudeOfResult;
@@ -21,6 +27,8 @@ public class ImageFFTProcessor {
         mImageColumns = columns;
 
         mImageData = null;
+        mFFTResultData = null;
+        mFFTInverseImageData = null;
         mMagnitudeOfResult = null;
         mPhaseOfResult = null;
     }
@@ -37,26 +45,45 @@ public class ImageFFTProcessor {
         performFFT();
     }
 
-    public double[][] getMagnitudeOfResult() {
-        if (mMagnitudeOfResult == null) {
-            performFFT();
+    public double[][] getFFTInverse() {
+        if (mFFTInverseImageData == null) {
+            mFFTProcessor.complexInverse(mFFTResultData, false);
+
+            double maxValue = 0;
+            for (int i = 0; i < mImageRows; i++) {
+                for (int j = 0; j < mImageColumns; j++) {
+                    maxValue = Math.max(maxValue, Math.abs(mFFTResultData[i][j * 2]));
+                }
+            }
+
+            mFFTInverseImageData = new double[mImageRows][mImageColumns];
+            int pixel;
+            for (int i = 0; i < mImageRows; i ++) {
+                for (int j = 0; j < mImageColumns; j ++) {
+                    pixel = (int) Math.abs(mFFTResultData[i][j * 2] / maxValue * 255);
+
+                    mFFTInverseImageData[i][j] = (double) (0xff000000 | pixel << 16 | pixel << 8 | pixel);
+                }
+            }
         }
+
+        return mFFTInverseImageData;
+    }
+
+    public double[][] getMagnitudeOfResult() {
         return mMagnitudeOfResult;
     }
 
     public double[][] getPhaseOfResult() {
-        if (mPhaseOfResult == null) {
-            performFFT();
-        }
         return mPhaseOfResult;
     }
 
     private void performFFT() {
         mFFTProcessor.complexForward(mImageData);
 
-        mImageData = shiftOrigin(mImageData);
         mMagnitudeOfResult = new double[mImageRows][mImageColumns];
         mPhaseOfResult = new double[mImageRows][mImageColumns];
+        mFFTResultData = new double[mImageRows][mImageColumns * 2];
 
         double maxMag = 0;
         double maxPhase = 0;
@@ -69,18 +96,47 @@ public class ImageFFTProcessor {
                 mMagnitudeOfResult[i][j] = Math.log(re * re + im * im + 0.01);
                 maxMag = Math.max(mMagnitudeOfResult[i][j], maxMag);
 
-                mPhaseOfResult[i][j] = Math.abs(Math.atan2(im, re));
+                mPhaseOfResult[i][j] = Math.atan2(im, re) + Math.PI;
                 maxPhase = Math.max(mPhaseOfResult[i][j], maxPhase);
+            }
+        }
+
+        int magPixel, phasePixel;
+        double angle;
+
+        for (int i = 0; i < mImageRows; i ++) {
+            for (int j = 0; j < mImageColumns; j ++) {
+                magPixel = (int) (Math.sqrt(Math.exp(mMagnitudeOfResult[i][j])) / Math.sqrt(Math.exp(maxMag)) * 255);
+                phasePixel = (int) (mPhaseOfResult[i][j] / maxPhase * 255);
+
+                angle = phasePixel / 255.0 * 2 * Math.PI - Math.PI;
+
+                mFFTResultData[i][j * 2] = magPixel * Math.cos(angle);
+                mFFTResultData[i][j * 2 + 1] = magPixel * Math.sin(angle);
+            }
+        }
+
+        mImageData = shiftOrigin(mImageData);
+
+        for (int i = 0; i < mImageRows; i++) {
+            for (int j = 0; j < mImageColumns; j++) {
+                double re = mImageData[i][2 * j];
+                double im = mImageData[i][2 * j + 1];
+
+                mMagnitudeOfResult[i][j] = Math.log(re * re + im * im + 0.01);
+
+                mPhaseOfResult[i][j] = Math.atan2(im, re) + Math.PI;
             }
         }
 
         for (int i = 0; i < mImageRows; i ++) {
             for (int j = 0; j < mImageColumns; j ++) {
-                int pixel = (int) (mMagnitudeOfResult[i][j] / maxMag * 255);
-                mMagnitudeOfResult[i][j] = (double) (0xff000000 | pixel << 16 | pixel << 8 | pixel);
+                magPixel = (int) (mMagnitudeOfResult[i][j] / maxMag * 255);
+                phasePixel = (int) (mPhaseOfResult[i][j] / maxPhase * 255);
 
-                pixel = (int) (mPhaseOfResult[i][j] / maxPhase * 255);
-                mPhaseOfResult[i][j] = (double) (0xff000000 | pixel << 16 | pixel << 8 | pixel);
+                mMagnitudeOfResult[i][j] = (double) (0xff000000 | magPixel << 16 | magPixel << 8 | magPixel);
+
+                mPhaseOfResult[i][j] = (double) (0xff000000 | phasePixel << 16 | phasePixel << 8 | phasePixel);
             }
         }
     }

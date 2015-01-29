@@ -1,6 +1,7 @@
 package me.panlong.realtimefftonimage.resultView;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -10,7 +11,7 @@ import android.view.View;
 /**
  * Created by panlong on 13/1/15.
  */
-public class InteractiveView extends View {
+public class InteractiveView extends View implements IDrawingBitmapSurface {
     public static final float PAINT_STROKE_WIDTH = 3f;
     public static final int DEFAULT_REC_WIDTH = 128;
     public static final int DEFAULT_REC_HEIGHT = 96;
@@ -21,6 +22,8 @@ public class InteractiveView extends View {
 
     private IChosenRecChangedListener mChosenAreaChangedListener;
 
+    private Bitmap mBitmap;
+
     private int mChosenRecCenterX;
     private int mChosenRecCenterY;
     private int mChosenRecWidth;
@@ -28,12 +31,14 @@ public class InteractiveView extends View {
 
     private Paint mPaint;
 
-    private Boolean isDrawing;
+    private Boolean isDrawingRec;
+    private Boolean isDrawingBitmap;
 
     public InteractiveView(Context context) {
         super(context);
 
-        isDrawing = false;
+        isDrawingRec = false;
+        isDrawingBitmap = false;
 
         initPaint();
     }
@@ -108,7 +113,7 @@ public class InteractiveView extends View {
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        if (isDrawing) {
+        if (isDrawingRec) {
             final int motionAction = event.getAction();
 
             switch (motionAction) {
@@ -163,27 +168,58 @@ public class InteractiveView extends View {
         notifyUserThread.start();
     }
 
-    public void startDrawing() {
-        isDrawing = true;
+    public void startDrawingRec() {
+        isDrawingRec = true;
         setDefaultRec();
 
         invalidate();
         notifyChosenRecChangedListener();
     }
 
-    public void stopDrawing() {
-        isDrawing = false;
+    public void stopDrawingRec() {
+        isDrawingRec = false;
+        invalidate();
+    }
+
+    public void startDrawingBitmap() {
+        isDrawingBitmap = true;
+        invalidate();
+    }
+
+    public void stopDrawingBitmap() {
+        isDrawingBitmap = false;
         invalidate();
     }
 
     @Override
     protected void onDraw(Canvas canvas) {
-        if (isDrawing) {
+        if (isDrawingRec) {
             canvas.drawRect(mChosenRecCenterX - mChosenRecWidth / 2,
                     mChosenRecCenterY - mChosenRecHeight / 2,
                     mChosenRecCenterX + mChosenRecWidth / 2,
                     mChosenRecCenterY + mChosenRecHeight / 2,
                     mPaint);
         }
+
+        if (isDrawingBitmap && mBitmap != null) {
+            int topLeftX, topLeftY;
+
+            if (isDrawingRec) {
+                topLeftX = mChosenRecCenterX - mChosenRecWidth / 2;
+                topLeftY = mChosenRecCenterY - mChosenRecHeight / 2;
+                mBitmap = Bitmap.createScaledBitmap(mBitmap, mChosenRecWidth, mChosenRecHeight, false);
+            } else {
+                topLeftX = topLeftY = 0;
+                mBitmap = Bitmap.createScaledBitmap(mBitmap, this.getWidth(), this.getHeight(), false);
+            }
+
+            canvas.drawBitmap(mBitmap, topLeftX, topLeftY, null);
+        }
+    }
+
+    @Override
+    public void draw(Bitmap bm) {
+        mBitmap = bm;
+        invalidate();
     }
 }
