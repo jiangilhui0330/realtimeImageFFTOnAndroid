@@ -16,6 +16,7 @@ import me.panlong.realtimefftonimage.resultView.DrawingView;
 import me.panlong.realtimefftonimage.resultView.IChosenRecChangedListener;
 import me.panlong.realtimefftonimage.resultView.MagnitudeSurfaceView;
 import me.panlong.realtimefftonimage.resultView.PhaseSurfaceView;
+import me.panlong.realtimefftonimage.utils.BitmapWorker;
 import me.panlong.realtimefftonimage.utils.ImageFormatFactory;
 
 
@@ -181,14 +182,17 @@ public class FFTMainActivity extends Activity implements ICameraFrameListener, I
 
             mFFTProcessor.readImageData(convertedGrayScaleData);
 
-            mMagnitudeBitmap = ImageFormatFactory.double2DArrayToBitmap(mFFTProcessor.getMagnitudeOfResult(), width, height);
-            mPhaseBitmap = ImageFormatFactory.double2DArrayToBitmap(mFFTProcessor.getPhaseOfResult(), width, height);
+            BitmapWorker magWorker = new BitmapWorker(mMagnitudeSurfaceView, width, height);
+            BitmapWorker phaseWorker = new BitmapWorker(mPhaseSurfaceView, width, height);
 
-            mMagnitudeSurfaceView.draw(mMagnitudeBitmap);
-            mPhaseSurfaceView.draw(mPhaseBitmap);
+            magWorker.execute(mFFTProcessor.getMagnitudeOfResult());
+            phaseWorker.execute(mFFTProcessor.getPhaseOfResult());
+//            mMagnitudeBitmap = ImageFormatFactory.double2DArrayToBitmap(mFFTProcessor.getMagnitudeOfResult(), width, height);
 
-            mMagnitudeBitmap.recycle();
-            mPhaseBitmap.recycle();
+//            mPhaseBitmap = ImageFormatFactory.double2DArrayToBitmap(mFFTProcessor.getPhaseOfResult(), width, height);
+
+//            mMagnitudeSurfaceView.draw(mMagnitudeBitmap);
+//            mPhaseSurfaceView.draw(mPhaseBitmap);
         }
     }
 

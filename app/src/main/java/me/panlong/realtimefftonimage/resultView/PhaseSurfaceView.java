@@ -12,6 +12,7 @@ import android.view.SurfaceView;
  */
 public class PhaseSurfaceView extends SurfaceView implements IDrawingBitmapSurface {
     private SurfaceHolder mHolder;
+    private Bitmap mScaledBitmap;
 
     public PhaseSurfaceView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -20,9 +21,10 @@ public class PhaseSurfaceView extends SurfaceView implements IDrawingBitmapSurfa
 
     public void draw(Bitmap bm) {
         Canvas canvas = mHolder.lockCanvas();
-        Bitmap scaledBitmap = Bitmap.createScaledBitmap(bm, this.getWidth(), this.getHeight(), false);
-        canvas.drawBitmap(scaledBitmap, 0, 0, null);
-        mHolder.unlockCanvasAndPost(canvas);
-        scaledBitmap.recycle();
+        if (canvas != null) {
+            mScaledBitmap = Bitmap.createScaledBitmap(bm, this.getWidth(), this.getHeight(), false);
+            canvas.drawBitmap(mScaledBitmap, 0, 0, null);
+            mHolder.unlockCanvasAndPost(canvas);
+        }
     }
 }
