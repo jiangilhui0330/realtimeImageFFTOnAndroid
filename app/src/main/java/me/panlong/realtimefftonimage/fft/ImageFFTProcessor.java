@@ -61,6 +61,7 @@ public class ImageFFTProcessor {
             for (int i = 0; i < mImageRows; i ++) {
                 for (int j = 0; j < mImageColumns; j ++) {
                     pixel = (int) Math.abs(mFFTResultData[i][j * 2] / maxValue * 255);
+                    pixel = 255 - pixel;
 
                     mFFTInverseImageData[i][j] = (double) (0xff000000 | pixel << 16 | pixel << 8 | pixel);
                 }

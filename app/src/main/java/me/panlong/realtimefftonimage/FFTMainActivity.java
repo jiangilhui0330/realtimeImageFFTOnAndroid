@@ -85,6 +85,7 @@ public class FFTMainActivity extends Activity implements ICameraFrameListener, I
                     mInteractiveView.startDrawingRec();
                 } else {
                     mInteractiveView.stopDrawingRec();
+                    mInteractiveView.stopDrawingBitmap();
                 }
             }
         });
