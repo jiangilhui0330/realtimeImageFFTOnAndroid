@@ -154,18 +154,11 @@ public class InteractiveView extends View implements IDrawingBitmapSurface {
     }
 
     private void notifyChosenRecChangedListener() {
-        Thread notifyUserThread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                if (mChosenAreaChangedListener != null) {
-                    int topLeftX = mChosenRecCenterX - mChosenRecWidth / 2;
-                    int topLeftY = mChosenRecCenterY - mChosenRecHeight / 2;
-                    mChosenAreaChangedListener.chosenRecChanged(topLeftX, topLeftY, mChosenRecWidth, mChosenRecHeight);
-                }
-            }
-        });
-
-        notifyUserThread.start();
+        if (mChosenAreaChangedListener != null) {
+            int topLeftX = mChosenRecCenterX - mChosenRecWidth / 2;
+            int topLeftY = mChosenRecCenterY - mChosenRecHeight / 2;
+            mChosenAreaChangedListener.chosenRecChanged(topLeftX, topLeftY, mChosenRecWidth, mChosenRecHeight);
+        }
     }
 
     public void startDrawingRec() {
@@ -207,10 +200,8 @@ public class InteractiveView extends View implements IDrawingBitmapSurface {
             if (isDrawingRec) {
                 topLeftX = mChosenRecCenterX - mChosenRecWidth / 2;
                 topLeftY = mChosenRecCenterY - mChosenRecHeight / 2;
-                mBitmap = Bitmap.createScaledBitmap(mBitmap, mChosenRecWidth, mChosenRecHeight, false);
             } else {
                 topLeftX = topLeftY = 0;
-                mBitmap = Bitmap.createScaledBitmap(mBitmap, this.getWidth(), this.getHeight(), false);
             }
 
             canvas.drawBitmap(mBitmap, topLeftX, topLeftY, null);
@@ -219,7 +210,11 @@ public class InteractiveView extends View implements IDrawingBitmapSurface {
 
     @Override
     public void draw(Bitmap bm) {
-        mBitmap = bm;
+        if (isDrawingRec) {
+            mBitmap = Bitmap.createScaledBitmap(bm, mChosenRecWidth, mChosenRecHeight, false);
+        } else {
+            mBitmap = Bitmap.createScaledBitmap(bm, this.getWidth(), this.getHeight(), false);
+        }
         invalidate();
     }
 }

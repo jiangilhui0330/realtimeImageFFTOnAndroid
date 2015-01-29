@@ -20,9 +20,10 @@ public class MagnitudeSurfaceView extends SurfaceView implements IDrawingBitmapS
     }
 
     public void draw(Bitmap bm) {
+        mScaledBitmap = Bitmap.createScaledBitmap(bm, this.getWidth(), this.getHeight(), false);
+
         Canvas canvas = mHolder.lockCanvas();
         if (canvas != null) {
-            mScaledBitmap = Bitmap.createScaledBitmap(bm, this.getWidth(), this.getHeight(), false);
             canvas.drawBitmap(mScaledBitmap, 0, 0, null);
             mHolder.unlockCanvasAndPost(canvas);
         }
