@@ -1,4 +1,4 @@
-package me.panlong.realtimefftonimage;
+package me.panlong.realtimefftonimage.fft;
 
 import edu.emory.mathcs.jtransforms.fft.DoubleFFT_2D;
 

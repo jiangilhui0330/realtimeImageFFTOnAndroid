@@ -9,6 +9,15 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.FrameLayout;
 
+import me.panlong.realtimefftonimage.camera.CameraPreview;
+import me.panlong.realtimefftonimage.camera.ICameraFrameListener;
+import me.panlong.realtimefftonimage.fft.ImageFFTProcessor;
+import me.panlong.realtimefftonimage.resultView.DrawingView;
+import me.panlong.realtimefftonimage.resultView.IChosenRecChangedListener;
+import me.panlong.realtimefftonimage.resultView.MagnitudeSurfaceView;
+import me.panlong.realtimefftonimage.resultView.PhaseSurfaceView;
+import me.panlong.realtimefftonimage.utils.ImageFormatFactory;
+
 
 public class FFTMainActivity extends Activity implements ICameraFrameListener, IChosenRecChangedListener {
     private CameraPreview mCameraPreview;

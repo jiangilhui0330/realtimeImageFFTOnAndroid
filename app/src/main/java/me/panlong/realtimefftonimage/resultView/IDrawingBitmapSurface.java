@@ -1,4 +1,4 @@
-package me.panlong.realtimefftonimage;
+package me.panlong.realtimefftonimage.resultView;
 
 import android.graphics.Bitmap;
 

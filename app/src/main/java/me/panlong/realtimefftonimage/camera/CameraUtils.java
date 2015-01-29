@@ -1,4 +1,4 @@
-package me.panlong.realtimefftonimage;
+package me.panlong.realtimefftonimage.camera;
 
 import android.content.Context;
 import android.content.pm.PackageManager;

@@ -1,4 +1,4 @@
-package me.panlong.realtimefftonimage;
+package me.panlong.realtimefftonimage.resultView;
 
 /**
  * Created by panlong on 13/1/15.
