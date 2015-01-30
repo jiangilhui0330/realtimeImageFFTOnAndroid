@@ -17,6 +17,12 @@ public class ImageFFTProcessor {
     private double[][] mFFTInverseImageData;
     private int mImageRows;
     private int mImageColumns;
+
+    private int mFilterPhaseLeft;
+    private int mFilterPhaseTop;
+    private int mFilterPhaseRight;
+    private int mFilterPhaseBottom;
+
     private double[][] mMagnitudeOfResult;
     private double[][] mPhaseOfResult;
 
@@ -33,7 +39,33 @@ public class ImageFFTProcessor {
         mPhaseOfResult = null;
     }
 
-    public void readImageData(double[][] data) {
+    public void readImageData(double[][] data, int filterPhaseLeft, int filterPhaseTop, int filterPhaseRight, int filterPhaseBottom) {
+        mFilterPhaseLeft = filterPhaseLeft;
+        mFilterPhaseTop = filterPhaseTop;
+        mFilterPhaseRight = filterPhaseRight;
+        mFilterPhaseBottom = filterPhaseBottom;
+
+        int centerX = (mFilterPhaseLeft + mFilterPhaseRight) / 2;
+        int centerY = (mFilterPhaseTop + mFilterPhaseBottom) / 2;
+        int newCenterX, newCenterY;
+
+        if (centerX < mImageColumns / 2) {
+            newCenterX = centerX + mImageColumns / 2;
+        } else {
+            newCenterX = centerX - mImageColumns / 2;
+        }
+
+        if (centerY < mImageRows / 2) {
+            newCenterY = centerY + mImageRows / 2;
+        } else {
+            newCenterY = centerY - mImageRows / 2;
+        }
+
+        mFilterPhaseLeft = mFilterPhaseLeft - centerX + newCenterX;
+        mFilterPhaseRight = mFilterPhaseRight - centerX + newCenterX;
+        mFilterPhaseTop = mFilterPhaseTop - centerY + newCenterY;
+        mFilterPhaseBottom = mFilterPhaseBottom - centerY + newCenterY;
+
         mImageData = new double[mImageRows][mImageColumns * 2];
         for (int i = 0; i < mImageRows; i++) {
             for (int j = 0; j < mImageColumns; j++) {
@@ -97,7 +129,15 @@ public class ImageFFTProcessor {
                 mMagnitudeOfResult[i][j] = Math.log(re * re + im * im + 0.01);
                 maxMag = Math.max(mMagnitudeOfResult[i][j], maxMag);
 
-                mPhaseOfResult[i][j] = Math.atan2(im, re) + Math.PI;
+                if (mFilterPhaseLeft == mFilterPhaseRight
+                        || (i >= mFilterPhaseLeft && i <= mFilterPhaseRight && j >= mFilterPhaseTop && j <= mFilterPhaseBottom)
+                        || (i >= 2 * mImageColumns - mFilterPhaseRight && i <= 2 * mImageColumns - mFilterPhaseLeft
+                && j >= 2 * mImageRows - mFilterPhaseBottom && j <= 2 * mImageRows - mFilterPhaseTop)) {
+                    mPhaseOfResult[i][j] = Math.atan2(im, re) + Math.PI;
+                } else {
+                    mPhaseOfResult[i][j] = 0;
+                }
+
                 maxPhase = Math.max(mPhaseOfResult[i][j], maxPhase);
             }
         }
@@ -119,14 +159,17 @@ public class ImageFFTProcessor {
 
         mImageData = shiftOrigin(mImageData);
 
+        maxMag = maxPhase = 0;
         for (int i = 0; i < mImageRows; i++) {
             for (int j = 0; j < mImageColumns; j++) {
                 double re = mImageData[i][2 * j];
                 double im = mImageData[i][2 * j + 1];
 
                 mMagnitudeOfResult[i][j] = Math.log(re * re + im * im + 0.01);
+                maxMag = Math.max(mMagnitudeOfResult[i][j], maxMag);
 
                 mPhaseOfResult[i][j] = Math.atan2(im, re) + Math.PI;
+                maxPhase = Math.max(mPhaseOfResult[i][j], maxPhase);
             }
         }
 
@@ -136,7 +179,6 @@ public class ImageFFTProcessor {
                 phasePixel = (int) (mPhaseOfResult[i][j] / maxPhase * 255);
 
                 mMagnitudeOfResult[i][j] = (double) (0xff000000 | magPixel << 16 | magPixel << 8 | magPixel);
-
                 mPhaseOfResult[i][j] = (double) (0xff000000 | phasePixel << 16 | phasePixel << 8 | phasePixel);
             }
         }
@@ -262,6 +304,140 @@ public class ImageFFTProcessor {
                 }
             }
         }
+
+        //Shifting of the origin is complete.  Copy
+        // the rearranged data from temp to output
+        // array.
+        for (int row = 0; row < numberOfRows; row++) {
+            for (int col = 0; col < numberOfCols; col++) {
+                output[row][col] = temp[row][col];
+            }
+        }
+        return output;
+    }
+
+    private static double[][] inverseShift(double[][] data) {
+        int numberOfRows = data.length;
+        int numberOfCols = data[0].length;
+        int newRows;
+        int newCols;
+
+        double[][] output =
+                new double[numberOfRows][numberOfCols];
+
+        //Must treat the data differently when the
+        // dimension is odd than when it is even.
+        if (numberOfRows % 2 != 0) {
+            newRows = numberOfRows +
+                    (numberOfRows - 1) / 2;
+        } else {
+            newRows = numberOfRows + numberOfRows / 2;
+        }
+
+        if (numberOfCols % 2 != 0) {
+            newCols = numberOfCols +
+                    (numberOfCols - 1) / 2;
+        } else {
+            newCols = numberOfCols + numberOfCols / 2;
+        }
+
+        //Create a temporary working array.
+        double[][] temp =
+                new double[newRows][newCols];
+
+        //Copy input data into the working array.
+        for (int row = 0; row < numberOfRows; row++) {
+            for (int col = 0; col < numberOfCols; col++) {
+                temp[row][col] = data[row][col];
+            }
+        }
+
+        //do the vertical shift first
+        if (numberOfRows % 2 != 0) {//shift for odd
+            //Slide topmost (numberOfRows-1)/2 rows
+            // down by numberOfRows rows.
+            for (int col = 0; col < numberOfCols; col++) {
+                for (int row = 0;
+                     row < (numberOfRows - 1) / 2; row++) {
+                    temp[row + numberOfRows][col] =
+                            temp[row][col];
+                }
+            }
+            //Now slide everything back up by
+            // (numberOfRows-1)/2 rows.
+            for (int col = 0; col < numberOfCols; col++) {
+                for (int row = 0;
+                     row < numberOfRows; row++) {
+                    temp[row][col] =
+                            temp[row + (numberOfRows - 1) / 2][col];
+                }
+            }
+
+        } else {//shift for even
+            //Slide topmost (numberOfRows/2) rows down
+            // by numberOfRows rows
+            for (int col = 0; col < numberOfCols; col++) {
+                for (int row = 0;
+                     row < numberOfRows / 2; row++) {
+                    temp[row + numberOfRows][col] =
+                            temp[row][col];
+                }
+            }
+
+            //Now slide everything back up by
+            // numberOfRows/2 rows.
+            for (int col = 0; col < numberOfCols; col++) {
+                for (int row = 0;
+                     row < numberOfRows; row++) {
+                    temp[row][col] =
+                            temp[row + numberOfRows / 2][col];
+                }
+            }
+        }
+
+        //now do the horizontal shift
+        if (numberOfCols % 2 != 0) {//shift for odd
+            //Slide leftmost (numberOfCols-1)/2 columns
+            // to the right by numberOfCols columns
+            for (int row = 0; row < numberOfRows; row++) {
+                for (int col = 0;
+                     col < (numberOfCols - 1) / 2; col++) {
+                    temp[row][col + numberOfCols] =
+                            temp[row][col];
+                }
+            }
+            //Now slide everything back to the left by
+            // (numberOfCols-1)/2 columns
+            for (int row = 0; row < numberOfRows; row++) {
+                for (int col = 0;
+                     col < numberOfCols; col++) {
+                    temp[row][col] =
+                            temp[row][col + (numberOfCols - 1) / 2];
+                }
+            }
+
+        } else {//shift for even
+            //Slide leftmost (numberOfCols/2) columns
+            // to the right by numberOfCols columns.
+            for (int row = 0; row < numberOfRows; row++) {
+                for (int col = 0;
+                     col < numberOfCols / 2; col++) {
+                    temp[row][col + numberOfCols] =
+                            temp[row][col];
+                }
+            }
+
+            //Now slide everything back to the left by
+            // numberOfCols/2 columns
+            for (int row = 0; row < numberOfRows; row++) {
+                for (int col = 0;
+                     col < numberOfCols; col++) {
+                    temp[row][col] =
+                            temp[row][col + numberOfCols / 2];
+                }
+            }
+        }//end else
+
 
         //Shifting of the origin is complete.  Copy
         // the rearranged data from temp to output

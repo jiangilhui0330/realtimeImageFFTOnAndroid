@@ -12,19 +12,26 @@ import android.view.SurfaceView;
  */
 public class MagnitudeSurfaceView extends SurfaceView implements IDrawingBitmapSurface {
     private SurfaceHolder mHolder;
-    private Bitmap mScaledBitmap;
 
     public MagnitudeSurfaceView(Context context, AttributeSet attrs) {
         super(context, attrs);
         mHolder = getHolder();
     }
 
-    public void draw(Bitmap bm) {
-        mScaledBitmap = Bitmap.createScaledBitmap(bm, this.getWidth(), this.getHeight(), false);
+    @Override
+    public int getRequiredBitmapWidth() {
+        return getWidth();
+    }
 
+    @Override
+    public int getRequiredBitmapHeight() {
+        return getHeight();
+    }
+
+    public void draw(Bitmap bm) {
         Canvas canvas = mHolder.lockCanvas();
         if (canvas != null) {
-            canvas.drawBitmap(mScaledBitmap, 0, 0, null);
+            canvas.drawBitmap(bm, 0, 0, null);
             mHolder.unlockCanvasAndPost(canvas);
         }
     }

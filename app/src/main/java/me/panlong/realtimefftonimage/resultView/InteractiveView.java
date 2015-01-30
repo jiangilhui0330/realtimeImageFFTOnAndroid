@@ -209,12 +209,26 @@ public class InteractiveView extends View implements IDrawingBitmapSurface {
     }
 
     @Override
-    public void draw(Bitmap bm) {
+    public int getRequiredBitmapWidth() {
         if (isDrawingRec) {
-            mBitmap = Bitmap.createScaledBitmap(bm, mChosenRecWidth, mChosenRecHeight, false);
+            return mChosenRecWidth;
         } else {
-            mBitmap = Bitmap.createScaledBitmap(bm, this.getWidth(), this.getHeight(), false);
+            return this.getWidth();
         }
+    }
+
+    @Override
+    public int getRequiredBitmapHeight() {
+        if (isDrawingRec) {
+            return mChosenRecHeight;
+        } else {
+            return this.getHeight();
+        }
+    }
+
+    @Override
+    public void draw(Bitmap bm) {
+        mBitmap = bm;
         invalidate();
     }
 }

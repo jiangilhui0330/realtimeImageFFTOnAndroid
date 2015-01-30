@@ -31,14 +31,13 @@ public class FFTMainActivity extends Activity implements ICameraFrameListener, I
     private Button mIncreaseRecBtn;
     private Button mDecreaseRecBtn;
     private Button mInverseBtn;
+    private Button mCleanBtn;
+
     private Boolean mIsStarted;
     private Boolean mIsChosenArea;
     private Boolean mIsDrawingInverse;
 
     private ImageFFTProcessor mFFTProcessor;
-
-    private Bitmap mMagnitudeBitmap;
-    private Bitmap mPhaseBitmap;
 
     private int mChosenRecTopLeftX;
     private int mChosenRecTopLeftY;
@@ -56,7 +55,7 @@ public class FFTMainActivity extends Activity implements ICameraFrameListener, I
 
         initButtons();
 
-        mIsStarted = false;
+        mIsStarted = true;
         mIsChosenArea = false;
         mIsDrawingInverse = false;
         mFFTProcessor = null;
@@ -122,6 +121,14 @@ public class FFTMainActivity extends Activity implements ICameraFrameListener, I
                 } else {
                     mInteractiveView.stopDrawingBitmap();
                 }
+            }
+        });
+
+        mCleanBtn = (Button) findViewById(R.id.button_clean);
+        mCleanBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mPhaseSurfaceView.clean();
             }
         });
     }
@@ -195,7 +202,22 @@ public class FFTMainActivity extends Activity implements ICameraFrameListener, I
 
             double[][] convertedGrayScaleData = ImageFormatFactory.NV21ToGrayScaleDouble2DArray(data, width, height);
 
-            mFFTProcessor.readImageData(convertedGrayScaleData);
+            if (mPhaseSurfaceView.isFilteringPhase()) {
+                int left = mPhaseSurfaceView.getChosenCenterX() - mPhaseSurfaceView.getChosenWidth() / 2;
+                int top = mPhaseSurfaceView.getChosenCenterY() - mPhaseSurfaceView.getChosenHeight() / 2;
+                int right = mPhaseSurfaceView.getChosenCenterX() + mPhaseSurfaceView.getChosenWidth() / 2;
+                int bottom = mPhaseSurfaceView.getChosenCenterY() + mPhaseSurfaceView.getChosenHeight() / 2;
+
+                left = left * width / mPhaseSurfaceView.getWidth();
+                top = top * height / mPhaseSurfaceView.getHeight();
+                right = right * width / mPhaseSurfaceView.getWidth();
+                bottom = bottom * height / mPhaseSurfaceView.getHeight();
+
+                mFFTProcessor.readImageData(convertedGrayScaleData,
+                        left, top, right, bottom);
+            }
+            else
+                mFFTProcessor.readImageData(convertedGrayScaleData, -1, -1, -1, -1);
 
             BitmapWorker magWorker = new BitmapWorker(mMagnitudeSurfaceView, width, height);
             BitmapWorker phaseWorker = new BitmapWorker(mPhaseSurfaceView, width, height);

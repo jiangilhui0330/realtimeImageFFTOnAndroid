@@ -12,6 +12,7 @@ import me.panlong.realtimefftonimage.resultView.IDrawingBitmapSurface;
  */
 public class BitmapWorker extends AsyncTask<double[][], Void, Bitmap> {
     private final WeakReference<IDrawingBitmapSurface> mDrawingViewReference;
+    private IDrawingBitmapSurface mDrawingViewInstance;
 
     private final int mWidth;
     private final int mHeight;
@@ -25,15 +26,22 @@ public class BitmapWorker extends AsyncTask<double[][], Void, Bitmap> {
 
     @Override
     protected Bitmap doInBackground(double[][]... params) {
-        return ImageFormatFactory.double2DArrayToBitmap(params[0], mWidth, mHeight);
+        if (mDrawingViewReference != null) {
+            mDrawingViewInstance = mDrawingViewReference.get();
+
+            if (mDrawingViewInstance != null) {
+                return Bitmap.createScaledBitmap(ImageFormatFactory.double2DArrayToBitmap(params[0], mWidth, mHeight), mDrawingViewInstance.getRequiredBitmapWidth(), mDrawingViewInstance.getRequiredBitmapHeight(), false);
+            }
+        }
+
+        return null;
     }
 
     @Override
     protected void onPostExecute(Bitmap bitmap) {
-        if (mDrawingViewReference != null && bitmap != null) {
-            final IDrawingBitmapSurface drawingView = mDrawingViewReference.get();
-            if (drawingView != null) {
-                drawingView.draw(bitmap);
+        if (mDrawingViewInstance!= null && bitmap != null) {
+            if (mDrawingViewInstance != null) {
+                mDrawingViewInstance.draw(bitmap);
             }
         }
     }

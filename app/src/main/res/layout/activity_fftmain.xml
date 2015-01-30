@@ -95,7 +95,15 @@
         android:layout_height="wrap_content"
         android:text="Inverse"
         android:id="@+id/button_inverse"
+        android:layout_alignBottom="@+id/surfaceView_phase"
+        android:layout_toRightOf="@+id/button_increaseRec"
+        android:layout_toEndOf="@+id/button_increaseRec" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Clean"
+        android:id="@+id/button_clean"
         android:layout_alignParentBottom="true"
-        android:layout_toLeftOf="@+id/surfaceView_phase"
-        android:layout_toStartOf="@+id/surfaceView_phase" />
+        android:layout_toLeftOf="@+id/surfaceView_phase" />
 </RelativeLayout>
