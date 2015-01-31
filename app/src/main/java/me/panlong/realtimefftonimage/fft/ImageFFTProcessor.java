@@ -126,18 +126,19 @@ public class ImageFFTProcessor {
                 double re = mImageData[i][2 * j];
                 double im = mImageData[i][2 * j + 1];
 
-                mMagnitudeOfResult[i][j] = Math.log(re * re + im * im + 0.01);
-                maxMag = Math.max(mMagnitudeOfResult[i][j], maxMag);
 
                 if (mFilterPhaseLeft == mFilterPhaseRight
                         || (i >= mFilterPhaseLeft && i <= mFilterPhaseRight && j >= mFilterPhaseTop && j <= mFilterPhaseBottom)
                         || (i >= 2 * mImageColumns - mFilterPhaseRight && i <= 2 * mImageColumns - mFilterPhaseLeft
                 && j >= 2 * mImageRows - mFilterPhaseBottom && j <= 2 * mImageRows - mFilterPhaseTop)) {
+                    mMagnitudeOfResult[i][j] = Math.log(re * re + im * im + 0.01);
                     mPhaseOfResult[i][j] = Math.atan2(im, re) + Math.PI;
                 } else {
+                    mMagnitudeOfResult[i][j] = 0;
                     mPhaseOfResult[i][j] = 0;
                 }
 
+                maxMag = Math.max(mMagnitudeOfResult[i][j], maxMag);
                 maxPhase = Math.max(mPhaseOfResult[i][j], maxPhase);
             }
         }
