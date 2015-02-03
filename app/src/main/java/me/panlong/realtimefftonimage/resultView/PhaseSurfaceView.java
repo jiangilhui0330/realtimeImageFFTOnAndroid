@@ -125,6 +125,7 @@ public class PhaseSurfaceView extends View implements IDrawingBitmapSurface {
                 int centerX = (int) event.getX();
                 int centerY = (int) event.getY();
 
+                // make sure the whole rectangle is in the region of surface view
                 if (centerX - mRecWidth / 2 < 0) {
                     mChosenCenterX = mRecWidth / 2;
                 } else if (centerX + mRecWidth / 2 > mWidth) {
@@ -139,6 +140,19 @@ public class PhaseSurfaceView extends View implements IDrawingBitmapSurface {
                     mChosenCenterY = mHeight - mRecHeight / 2;
                 } else {
                     mChosenCenterY = centerY;
+                }
+
+                // make sure the rectangle does not cross the central lines
+                if (mChosenCenterX < mWidth / 2 && mChosenCenterX + mRecWidth / 2 > mWidth / 2) {
+                    mChosenCenterX = mWidth / 2 - mRecWidth / 2;
+                } else if (mChosenCenterX > mWidth / 2 && mChosenCenterX - mRecWidth / 2 < mWidth / 2) {
+                    mChosenCenterX = mWidth / 2 + mRecWidth / 2;
+                }
+
+                if (mChosenCenterY < mHeight / 2 && mChosenCenterY + mRecHeight / 2 > mHeight / 2) {
+                    mChosenCenterY = mHeight / 2 - mRecHeight / 2;
+                } else if (mChosenCenterY > mHeight / 2 && mChosenCenterY - mRecHeight / 2 < mHeight / 2) {
+                    mChosenCenterY = mHeight / 2 + mRecHeight / 2;
                 }
 
                 invalidate();
