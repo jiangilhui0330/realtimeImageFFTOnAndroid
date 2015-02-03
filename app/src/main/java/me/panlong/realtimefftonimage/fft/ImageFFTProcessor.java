@@ -128,9 +128,9 @@ public class ImageFFTProcessor {
 
 
                 if (mFilterPhaseLeft == mFilterPhaseRight
-                        || (i >= mFilterPhaseLeft && i <= mFilterPhaseRight && j >= mFilterPhaseTop && j <= mFilterPhaseBottom)
-                        || (i >= 2 * mImageColumns - mFilterPhaseRight && i <= 2 * mImageColumns - mFilterPhaseLeft
-                && j >= 2 * mImageRows - mFilterPhaseBottom && j <= 2 * mImageRows - mFilterPhaseTop)) {
+                        || (i > mFilterPhaseLeft && i < mFilterPhaseRight && j > mFilterPhaseTop && j < mFilterPhaseBottom)
+                        || (i > mImageColumns - mFilterPhaseRight && i < mImageColumns - mFilterPhaseLeft
+                && j > mImageRows - mFilterPhaseBottom && j < mImageRows - mFilterPhaseTop)) {
                     mMagnitudeOfResult[i][j] = Math.log(re * re + im * im + 0.01);
                     mPhaseOfResult[i][j] = Math.atan2(im, re) + Math.PI;
                 } else {
